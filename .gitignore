@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+.python-version
+.venv/
+venv/
+env/
+
+# Node
+node_modules/
+dist/
+build/
+.next/
+.vite/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# AI / ML artifacts
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.safetensors
+models/
+checkpoints/
+runs/
+wandb/
+
+# Data
+data/raw/
+data/private/
+
+# Editors and OS
+.idea/
+.vscode/
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+logs/

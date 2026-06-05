@@ -14,5 +14,7 @@ class AgentQueryResponse(BaseModel):
     mode: str
     answer: str
     tool_name: str
+    tool_description: str
     tool_args: dict[str, Any]
+    route_reason: str
     result: dict[str, Any]

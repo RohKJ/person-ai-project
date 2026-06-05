@@ -37,6 +37,9 @@ if run_clicked and query:
     cols[0].metric("Agent Mode", response["mode"])
     cols[1].metric("Tool", response["tool_name"])
 
+    st.caption(response.get("tool_description", ""))
+    st.write(f"Route: {response.get('route_reason', 'N/A')}")
+
     with st.expander("Tool Arguments", expanded=True):
         st.json(response["tool_args"])
 

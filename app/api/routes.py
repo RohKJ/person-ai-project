@@ -4,12 +4,13 @@ from datetime import date, timedelta
 
 from fastapi import APIRouter, Query
 
+from app.agent.registry import DEFAULT_TOOL_REGISTRY
 from app.agent.router import AgentRouter
 from app.agent.schemas import AgentQueryRequest, AgentQueryResponse
 from app.analysis.ads import get_campaign_performance
 from app.analysis.inventory import check_inventory_risk
 from app.analysis.reviews import summarize_reviews
-from app.analysis.sales import get_daily_sales_summary
+from app.analysis.sales import detect_sales_anomaly, get_daily_sales_summary
 from app.core.config import DB_PATH
 
 
@@ -28,6 +29,15 @@ def health() -> dict:
 @router.get("/sales/daily")
 def sales_daily(target_date: str = Query(default_factory=lambda: date.today().isoformat(), alias="date")) -> dict:
     return get_daily_sales_summary(target_date)
+
+
+@router.get("/sales/anomaly")
+def sales_anomaly(
+    start_date: str = Query(default_factory=lambda: (date.today() - timedelta(days=6)).isoformat()),
+    end_date: str = Query(default_factory=lambda: date.today().isoformat()),
+    threshold_pct: float = 40.0,
+) -> dict:
+    return detect_sales_anomaly(start_date, end_date, threshold_pct=threshold_pct)
 
 
 @router.get("/ads/performance")
@@ -49,6 +59,15 @@ def reviews_summary(
     end_date: str = Query(default_factory=lambda: date.today().isoformat()),
 ) -> dict:
     return summarize_reviews(start_date, end_date)
+
+
+@router.get("/agent/tools")
+def agent_tools() -> dict:
+    return {
+        "mode": "mock",
+        "tools": DEFAULT_TOOL_REGISTRY.list_tools(),
+        "openai_tool_schemas": DEFAULT_TOOL_REGISTRY.openai_tool_schemas(),
+    }
 
 
 @router.post("/agent/query", response_model=AgentQueryResponse)

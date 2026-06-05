@@ -32,7 +32,8 @@ CSV Generator -> SQLite DB -> Analysis Tools -> Agent Router
 - CSV 샘플 데이터는 `scripts/generate_sample_data.py`에서 생성합니다.
 - SQLite 적재는 `scripts/init_db.py`가 담당합니다.
 - SQL/Pandas 기반 분석 함수는 `app/analysis`에 모았습니다.
-- Agent는 `app/agent/router.py`에서 rule-based mock mode로 Tool을 선택합니다.
+- Agent는 `app/agent/registry.py`의 Tool Registry를 기준으로 Tool을 선택하고 실행합니다.
+- Tool 입력값은 `app/agent/tool_schemas.py`의 Pydantic 스키마로 검증합니다.
 - FastAPI와 Streamlit은 같은 분석 함수를 호출합니다.
 - 모든 주요 분석 결과는 `formula`와 `evidence`를 함께 반환합니다.
 
@@ -62,12 +63,13 @@ CSV Generator -> SQLite DB -> Analysis Tools -> Agent Router
 ## 6. Agent Tool 설계
 
 현재 Agent는 OpenAI API Key 없이 동작하는 mock/rule-based 모드입니다.
+구조는 `Router -> Tool Registry -> Tool Args Schema -> Analysis Function -> Answer Formatter` 흐름입니다.
 
 지원 Tool:
 
 - `get_daily_sales_summary(date)`
 - `get_campaign_performance(start_date, end_date)`
-- `detect_sales_anomaly(start_date, end_date)`
+- `detect_sales_anomaly(start_date, end_date, threshold_pct=40.0)`
 - `check_inventory_risk(days=7)`
 - `summarize_reviews(start_date, end_date)`
 - `generate_slack_report(report_type, date, start_date, end_date)`
@@ -78,6 +80,7 @@ CSV Generator -> SQLite DB -> Analysis Tools -> Agent Router
 | --- | --- |
 | 어제 매출 요약해줘 | `get_daily_sales_summary` |
 | 이번 주 광고 성과 알려줘 | `get_campaign_performance` |
+| 이번 주 매출 급락 상품 찾아줘 | `detect_sales_anomaly` |
 | 품절 위험 상품 있어? | `check_inventory_risk` |
 | 리뷰 불만사항 정리해줘 | `summarize_reviews` |
 | 오늘 슬랙 보고서 만들어줘 | `generate_slack_report` |
@@ -86,7 +89,8 @@ CSV Generator -> SQLite DB -> Analysis Tools -> Agent Router
 
 - Agent 답변의 숫자는 Tool 반환값에서만 사용합니다.
 - Tool 반환값에는 `formula`와 `evidence`가 포함됩니다.
-- 향후 LangGraph/OpenAI Tool Calling으로 교체해도 분석 함수는 그대로 재사용할 수 있습니다.
+- `/agent/tools`에서 등록 Tool과 OpenAI Tool Calling으로 확장 가능한 JSON schema를 확인할 수 있습니다.
+- 향후 LangGraph/OpenAI Tool Calling으로 교체해도 Tool Registry와 분석 함수는 그대로 재사용할 수 있습니다.
 
 ## 7. 실행 방법
 
@@ -168,9 +172,11 @@ http://127.0.0.1:8000/docs
 | --- | --- | --- |
 | `GET` | `/health` | 서버와 DB 파일 상태 확인 |
 | `GET` | `/sales/daily?date=YYYY-MM-DD` | 일별 매출 요약 |
+| `GET` | `/sales/anomaly?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD&threshold_pct=40` | 매출 이상 탐지 |
 | `GET` | `/ads/performance?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD` | 광고 캠페인 성과 |
 | `GET` | `/inventory/risk?days=7` | 재고 리스크 상품 |
 | `GET` | `/reviews/summary?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD` | 리뷰/VOC 요약 |
+| `GET` | `/agent/tools` | Agent Tool Registry와 Tool schema 조회 |
 | `POST` | `/agent/query` | 자연어 질문 기반 Agent 응답 |
 
 Agent 요청 예시:

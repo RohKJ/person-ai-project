@@ -90,7 +90,35 @@ CSV Generator -> SQLite DB -> Analysis Tools -> Agent Router
 
 ## 7. 실행 방법
 
-Python 3.11 기준입니다.
+Python 3.11 기준입니다. Windows PowerShell에서는 아래 간편 스크립트를 사용할 수 있습니다.
+
+전체 초기화와 검증:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/dev.ps1 all
+```
+
+FastAPI 실행:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/dev.ps1 api
+```
+
+Streamlit 실행:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/dev.ps1 dashboard
+```
+
+로컬 서버 종료:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/dev.ps1 stop
+```
+
+개별 명령어로 실행하려면 아래 순서를 따르면 됩니다.
+
+의존성 설치:
 
 ```bash
 pip install -r requirements.txt

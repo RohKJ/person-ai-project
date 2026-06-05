@@ -32,6 +32,15 @@ wandb/
 # Test cache
 .pytest_cache/
 
+# Coverage and local tooling
+.coverage
+htmlcov/
+.ruff_cache/
+.mypy_cache/
+
+# Streamlit secrets
+.streamlit/secrets.toml
+
 # Data
 data/raw/
 data/private/

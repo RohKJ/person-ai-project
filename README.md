@@ -1,4 +1,4 @@
-# AI Project
+# person-ai-project
 
 Personal AI project workspace.
 

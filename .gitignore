@@ -24,14 +24,20 @@ build/
 *.pth
 *.onnx
 *.safetensors
-models/
+/models/
 checkpoints/
 runs/
 wandb/
 
+# Test cache
+.pytest_cache/
+
 # Data
 data/raw/
 data/private/
+data/*.db
+data/*.sqlite
+data/*.sqlite3
 
 # Editors and OS
 .idea/

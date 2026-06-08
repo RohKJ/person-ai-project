@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
@@ -53,14 +54,23 @@ class AgentTool:
     def format_answer(self, result: dict[str, Any]) -> str:
         return self.answer_formatter(result)
 
-    def openai_tool_schema(self) -> dict[str, Any]:
+    def openai_responses_tool_schema(self) -> dict[str, Any]:
+        parameters = deepcopy(self.args_model.model_json_schema())
+        properties = parameters.get("properties", {})
+        for property_schema in properties.values():
+            property_schema.pop("default", None)
+            property_schema.pop("title", None)
+
+        parameters["required"] = list(properties)
+        parameters["additionalProperties"] = False
+        parameters.pop("title", None)
+
         return {
             "type": "function",
-            "function": {
-                "name": self.name,
-                "description": self.description,
-                "parameters": self.args_model.model_json_schema(),
-            },
+            "name": self.name,
+            "description": self.description,
+            "parameters": parameters,
+            "strict": True,
         }
 
 

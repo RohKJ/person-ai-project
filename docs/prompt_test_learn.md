@@ -9,9 +9,17 @@ This document tracks prompt and agent-routing experiments for the D2C operations
 | TBD | 어제 매출 요약해줘 | get_daily_sales_summary | TBD | TBD | Verify relative date handling. |
 | TBD | 이번 주 광고 성과 알려줘 | get_campaign_performance | TBD | TBD | Check week boundary logic. |
 | TBD | 이번 주 매출 급락 상품 찾아줘 | detect_sales_anomaly | TBD | TBD | Confirm anomaly routing before default sales routing. |
-| TBD | 품절 위험 상품 있어? | check_inventory_risk | TBD | TBD | Confirm evidence includes stock and avg sales. |
+| 2026-06-08 | 품절 위험 상품 있어? | check_inventory_risk | check_inventory_risk | Pass | OpenAI selected `days=7`; final risk count came from the local analysis Tool. |
 | TBD | 리뷰 불만사항 정리해줘 | summarize_reviews | TBD | TBD | Improve complaint keyword rules. |
 | TBD | 오늘 슬랙 보고서 만들어줘 | generate_slack_report | TBD | TBD | Validate report uses only tool results. |
+
+## Provider Experiments
+
+| Date | Mode | Scenario | Expected | Actual | Learning |
+| --- | --- | --- | --- | --- | --- |
+| TBD | auto | No `OPENAI_API_KEY` | Resolve to Mock provider | TBD | Confirm local-first execution. |
+| 2026-06-08 | openai | API Key configured | Model selects exactly one registered Tool | Pass | Responses API selected `check_inventory_risk(days=7)`. |
+| TBD | openai | Tool result contains metrics | Final answer uses deterministic formatter | TBD | Confirm no model-generated numbers. |
 
 ## Guardrails
 
@@ -19,4 +27,4 @@ This document tracks prompt and agent-routing experiments for the D2C operations
 - Agent responses should expose the tool name, arguments, formula, and evidence.
 - Registered tools should expose a Pydantic argument schema.
 - Mock mode must work without an OpenAI API key.
-- Future LLM mode should convert user intent into tool calls, not generate metric values directly.
+- OpenAI mode converts user intent into one Tool call and does not generate metric values directly.

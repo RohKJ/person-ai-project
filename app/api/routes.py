@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query
 
+from app.agent.errors import AgentError
 from app.agent.registry import DEFAULT_TOOL_REGISTRY
-from app.agent.router import AgentRouter
 from app.agent.schemas import AgentQueryRequest, AgentQueryResponse
+from app.agent.service import AgentService
 from app.analysis.ads import get_campaign_performance
 from app.analysis.inventory import check_inventory_risk
 from app.analysis.reviews import summarize_reviews
@@ -64,13 +65,23 @@ def reviews_summary(
 @router.get("/agent/tools")
 def agent_tools() -> dict:
     return {
-        "mode": "mock",
         "tools": DEFAULT_TOOL_REGISTRY.list_tools(),
-        "openai_tool_schemas": DEFAULT_TOOL_REGISTRY.openai_tool_schemas(),
+        "openai_responses_tool_schemas": DEFAULT_TOOL_REGISTRY.openai_responses_tool_schemas(),
     }
+
+
+@router.get("/agent/status")
+def agent_status() -> dict:
+    try:
+        return AgentService().status()
+    except AgentError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @router.post("/agent/query", response_model=AgentQueryResponse)
 def agent_query(request: AgentQueryRequest) -> dict:
-    agent = AgentRouter()
-    return agent.run(request.query)
+    try:
+        agent = AgentService(mode=request.mode)
+        return agent.run(request.query)
+    except AgentError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc

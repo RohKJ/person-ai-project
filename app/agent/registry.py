@@ -45,8 +45,8 @@ class ToolRegistry:
     def list_tools(self) -> list[dict[str, Any]]:
         return [self.describe(tool.name) for tool in self._tools]
 
-    def openai_tool_schemas(self) -> list[dict[str, Any]]:
-        return [tool.openai_tool_schema() for tool in self._tools]
+    def openai_responses_tool_schemas(self) -> list[dict[str, Any]]:
+        return [tool.openai_responses_tool_schema() for tool in self._tools]
 
 
 DEFAULT_TOOL_REGISTRY = ToolRegistry()

@@ -57,10 +57,15 @@ def test_agent_router_sales_anomaly() -> None:
 
 def test_agent_tool_registry_exposes_tool_schemas() -> None:
     tools = DEFAULT_TOOL_REGISTRY.list_tools()
-    schemas = DEFAULT_TOOL_REGISTRY.openai_tool_schemas()
+    schemas = DEFAULT_TOOL_REGISTRY.openai_responses_tool_schemas()
     tool_names = {tool["name"] for tool in tools}
-    schema_names = {schema["function"]["name"] for schema in schemas}
+    schema_names = {schema["name"] for schema in schemas}
 
     assert "get_daily_sales_summary" in tool_names
     assert "detect_sales_anomaly" in tool_names
     assert tool_names == schema_names
+    assert all(schema["strict"] is True for schema in schemas)
+    assert all(
+        schema["parameters"]["required"] == list(schema["parameters"]["properties"])
+        for schema in schemas
+    )

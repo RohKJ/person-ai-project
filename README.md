@@ -41,6 +41,12 @@ CSV Generator -> SQLite DB -> Analysis Tools <- Tool Registry
 - FastAPI와 Streamlit은 같은 분석 함수를 호출합니다.
 - 모든 주요 분석 결과는 `formula`와 `evidence`를 함께 반환합니다.
 
+### Dashboard Preview
+
+![Operations Overview](docs/screenshots/operations-overview.png)
+
+![Agent Tool Trace](docs/screenshots/agent-tool-trace.png)
+
 ## 4. 데이터 구조
 
 샘플 데이터는 `data/sample`에 생성됩니다.
@@ -218,12 +224,12 @@ OpenAI Tool Calling 구현은 OpenAI 공식 [Function calling guide](https://dev
 
 Streamlit 화면:
 
-- `Home`: 총매출, 광고비, ROAS, 재고 위험 상품 수, 부정 리뷰 수
-- `Sales Dashboard`: 일별 매출 추이, 상품별 매출
-- `Marketing Dashboard`: 캠페인별 광고비, ROAS, CTR, CVR
-- `Inventory Dashboard`: 상품별 재고, 예상 소진일, 품절 위험 상품
-- `Review/VOC Dashboard`: 평균 평점, 부정 리뷰, 주요 불만 키워드
-- `AI Agent Report`: 자연어 질문, Agent 답변, 사용 Tool, 계산식, 근거 데이터
+- `Home`: 최신 적재일 기준 KPI, 운영 이슈 Action Queue, 매출/ROAS 추이
+- `Sales Dashboard`: 일별 매출, 상품별 성과, 기간 비교 이상 탐지
+- `Marketing Dashboard`: 예산 배분, 캠페인 ROAS, CTR, CVR, CPA
+- `Inventory Dashboard`: 발주 우선순위, 예상 소진일, 권장 발주량
+- `Review/VOC Dashboard`: 부정 리뷰율, 불만 키워드, 미해결 CS
+- `AI Agent Report`: 자연어 질문, Provider/Tool trace, 계산식, 근거 데이터
 
 ## 10. Test & Learn 계획
 

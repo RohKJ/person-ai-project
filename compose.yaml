@@ -1,0 +1,87 @@
+services:
+  init:
+    image: person-ai-project:local
+    build:
+      context: .
+    command: >
+      sh -c "python scripts/generate_sample_data.py &&
+             python scripts/init_db.py"
+    environment:
+      AGENT_MODE: mock
+    volumes:
+      - d2c_data:/app/data
+    restart: "no"
+
+  api:
+    image: person-ai-project:local
+    build:
+      context: .
+    command:
+      - python
+      - -m
+      - uvicorn
+      - app.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+    environment:
+      AGENT_MODE: mock
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5.4-mini}
+    volumes:
+      - d2c_data:/app/data
+    ports:
+      - "8000:8000"
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  dashboard:
+    image: person-ai-project:local
+    build:
+      context: .
+    command:
+      - python
+      - -m
+      - streamlit
+      - run
+      - dashboard/Home.py
+      - --server.address
+      - 0.0.0.0
+      - --server.port
+      - "8501"
+      - --server.headless
+      - "true"
+    environment:
+      AGENT_MODE: mock
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5.4-mini}
+    volumes:
+      - d2c_data:/app/data
+    ports:
+      - "8501:8501"
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health')"
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  d2c_data:

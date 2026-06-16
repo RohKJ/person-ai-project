@@ -241,6 +241,7 @@ http://127.0.0.1:8000/docs
 | `GET` | `/reviews/summary` | 리뷰/VOC 요약 |
 | `GET` | `/agent/tools` | Tool Registry와 strict schema 조회 |
 | `GET` | `/agent/status` | 요청 모드, 실제 Provider, API Key 설정 상태 |
+| `GET` | `/agent/evaluation` | Agent 평가 데이터셋 실행 결과와 품질 지표 |
 | `POST` | `/agent/query` | 자연어 질문 기반 Agent 실행 |
 
 Agent 요청 예시:
@@ -258,7 +259,7 @@ curl -X POST http://127.0.0.1:8000/agent/query \
 - **Marketing Dashboard**: 캠페인별 예산, ROAS, CTR, CVR, CPA
 - **Inventory Dashboard**: 현재 재고, 예상 소진일, 권장 발주량
 - **Review/VOC Dashboard**: 평균 평점, 부정 리뷰, 키워드, 미해결 CS
-- **AI Agent Report**: 자연어 질문, Provider/Tool trace, 계산식, 근거 데이터
+- **AI Agent Report**: Agent Evaluation 점수판, 자연어 질문, Provider/Tool trace, 계산식, 근거 데이터
 
 ## 테스트와 CI
 

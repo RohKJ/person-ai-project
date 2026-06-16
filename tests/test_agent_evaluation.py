@@ -1,6 +1,6 @@
 from datetime import date
 
-from scripts.evaluate_agent import (
+from app.agent.evaluation import (
     DEFAULT_CASES_PATH,
     evaluate_cases,
     load_eval_cases,

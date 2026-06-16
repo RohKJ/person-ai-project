@@ -5,6 +5,7 @@ from datetime import date, timedelta
 from fastapi import APIRouter, HTTPException, Query
 
 from app.agent.errors import AgentError
+from app.agent.evaluation import evaluate_cases, load_eval_cases
 from app.agent.registry import DEFAULT_TOOL_REGISTRY
 from app.agent.schemas import AgentQueryRequest, AgentQueryResponse
 from app.agent.service import AgentService
@@ -74,6 +75,20 @@ def agent_tools() -> dict:
 def agent_status() -> dict:
     try:
         return AgentService().status()
+    except AgentError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@router.get("/agent/evaluation")
+def agent_evaluation(
+    mode: str = Query(
+        "mock",
+        pattern="^(mock|auto|openai)$",
+        description="Provider mode used while running the evaluation dataset.",
+    ),
+) -> dict:
+    try:
+        return evaluate_cases(load_eval_cases(), mode=mode)
     except AgentError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 

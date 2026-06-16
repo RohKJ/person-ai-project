@@ -11,6 +11,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from app.agent.errors import AgentError
+from app.agent.evaluation import evaluate_cases, load_eval_cases
 from app.agent.service import AgentService
 from dashboard.common import (
     configure_page,
@@ -22,6 +23,11 @@ from dashboard.common import (
 
 configure_page("AI Agent Report")
 sidebar_context()
+
+
+@st.cache_data(ttl=60)
+def run_agent_eval(mode: str = "mock") -> dict:
+    return evaluate_cases(load_eval_cases(), mode=mode)
 
 with st.sidebar:
     mode = st.segmented_control(
@@ -42,6 +48,39 @@ page_header(
     "AI Agent Report",
     "Natural-language operations query with grounded Tool execution trace",
 )
+
+section_header("Agent Evaluation Scorecard")
+try:
+    eval_report = run_agent_eval("mock")
+    summary = eval_report["summary"]
+    eval_cols = st.columns(4)
+    eval_cols[0].metric("Overall", f"{summary['overall_pass_rate']:.0%}")
+    eval_cols[1].metric("Tool", f"{summary['tool_accuracy']:.0%}")
+    eval_cols[2].metric("Args", f"{summary['argument_accuracy']:.0%}")
+    eval_cols[3].metric("Grounding", f"{summary['grounding_coverage']:.0%}")
+
+    with st.expander("Evaluation cases", expanded=False):
+        eval_df = pd.DataFrame(eval_report["cases"])
+        display_columns = [
+            "id",
+            "query",
+            "expected_tool",
+            "actual_tool",
+            "tool_passed",
+            "args_passed",
+            "grounding_passed",
+        ]
+        st.caption(
+            f"Reference date: {eval_report['reference_date']} "
+            "(latest inventory date in SQLite)"
+        )
+        st.dataframe(
+            eval_df[display_columns],
+            use_container_width=True,
+            hide_index=True,
+        )
+except AgentError as exc:
+    st.error(str(exc))
 
 examples = [
     "어제 매출 요약해줘",

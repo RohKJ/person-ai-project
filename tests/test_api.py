@@ -31,3 +31,15 @@ def test_agent_status_defaults_to_mock_without_api_key(monkeypatch) -> None:
 
     assert response.status_code == 200
     assert response.json()["resolved_mode"] == "mock"
+
+
+def test_agent_evaluation_endpoint_returns_scorecard() -> None:
+    client = TestClient(app)
+    response = client.get("/agent/evaluation")
+
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert payload["summary"]["total_cases"] >= 1
+    assert payload["summary"]["tool_accuracy"] == 1.0
+    assert payload["summary"]["grounding_coverage"] == 1.0

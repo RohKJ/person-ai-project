@@ -199,6 +199,8 @@ python scripts/evaluate_agent.py
 
 최근 평가 결과는 [`docs/agent_eval_report.md`](docs/agent_eval_report.md)에 저장됩니다.
 
+지금까지의 구현 순서와 현재 상태는 [`docs/project_progress.md`](docs/project_progress.md)에 정리되어 있습니다.
+
 ## 데이터 구조
 
 실제 회사 데이터 대신 스크립트가 생성한 가상 헤어케어 브랜드 데이터를 사용합니다.

@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet("help", "setup", "data", "db", "check", "test", "api", "dashboard", "all", "stop")]
+    [ValidateSet("help", "setup", "data", "db", "check", "test", "eval", "api", "dashboard", "all", "stop")]
     [string]$Task = "help"
 )
 
@@ -35,6 +35,11 @@ function Run-Checks {
 
     Write-Step "Running tests"
     python -m pytest
+}
+
+function Run-AgentEvaluation {
+    Write-Step "Running agent evaluation"
+    python scripts/evaluate_agent.py
 }
 
 function Start-Api {
@@ -76,9 +81,10 @@ function Show-Help {
     Write-Host "  db         Initialize SQLite database"
     Write-Host "  check      Compile Python files and run tests"
     Write-Host "  test       Run pytest"
+    Write-Host "  eval       Run Agent routing and grounding evaluation"
     Write-Host "  api        Start FastAPI"
     Write-Host "  dashboard  Start Streamlit"
-    Write-Host "  all        setup + data + db + check"
+    Write-Host "  all        setup + data + db + check + eval"
     Write-Host "  stop       Stop local servers on ports 8000 and 8501"
 }
 
@@ -91,6 +97,7 @@ switch ($Task) {
         Write-Step "Running tests"
         python -m pytest
     }
+    "eval" { Run-AgentEvaluation }
     "api" { Start-Api }
     "dashboard" { Start-Dashboard }
     "all" {
@@ -98,6 +105,7 @@ switch ($Task) {
         Generate-SampleData
         Initialize-Database
         Run-Checks
+        Run-AgentEvaluation
     }
     "stop" { Stop-LocalServers }
     default { Show-Help }
